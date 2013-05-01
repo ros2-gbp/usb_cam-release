@@ -1,0 +1,12 @@
+Source: ros-groovy-usb-cam
+Section: misc
+Priority: extra
+Maintainer: Benjamin Pitzer <benjamin.pitzer@bosch.com>
+Build-Depends: debhelper (>= 7.0.50~), ros-groovy-catkin, ros-groovy-image-transport, ros-groovy-roscpp, ros-groovy-self-test, ros-groovy-sensor-msgs, ros-groovy-std-msgs
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-groovy-usb-cam
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-groovy-image-transport, ros-groovy-roscpp, ros-groovy-self-test, ros-groovy-sensor-msgs, ros-groovy-std-msgs
+Description: A generic driver for USB camera that are supported by V4L
