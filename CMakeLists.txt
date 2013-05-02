@@ -6,8 +6,7 @@ find_package(catkin
 		roscpp 
 		std_msgs 
 		sensor_msgs 
-		self_test )
-		#libswscale-dev)
+		self_test)
 
 
 set(ROS_BUILD_TYPE Release)
@@ -21,7 +20,7 @@ catkin_package(
 		roscpp 
 		std_msgs 
 		sensor_msgs 
-		self_test #libswscale-dev
+		self_test
 )
 
 include_directories(include
