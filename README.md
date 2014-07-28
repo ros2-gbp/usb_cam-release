@@ -1,3 +1,22 @@
+## usb_cam (groovy) - 0.1.5-0
+
+The packages in the `usb_cam` repository were released into the `groovy` distro by running `/usr/bin/bloom-release --rosdistro groovy --track groovy usb_cam --new-track` on `Mon, 28 Jul 2014 14:47:17 -0000`
+
+The `usb_cam` package was released.
+
+Version of package(s) in repository `usb_cam`:
+- rosdistro version: `0.1.3-0`
+- old version: `0.1.3-0`
+- new version: `0.1.5-0`
+
+Versions of tools used:
+- bloom version: `0.5.10`
+- catkin_pkg version: `0.2.4`
+- rosdep version: `0.10.28`
+- rosdistro version: `0.3.5`
+- vcstools version: `0.1.35`
+
+
 ## usb_cam - 0.1.3-0
 
 User `rctoris@RCT-DESKTOP` released the packages in the `usb_cam` repository by running `/usr/bin/bloom-release usb_cam --track hydro --rosdistro hydro --new-track` on `Thu, 29 Aug 2013 15:49:42 -0000`
