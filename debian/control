@@ -1,0 +1,12 @@
+Source: ros-indigo-usb-cam
+Section: misc
+Priority: extra
+Maintainer: Russell Toris <rctoris@wpi.edu>
+Build-Depends: debhelper (>= 9.0.0), libavcodec-dev, libavformat-dev, libavutil-dev, libswscale-dev, ros-indigo-camera-info-manager, ros-indigo-catkin, ros-indigo-image-transport, ros-indigo-roscpp, ros-indigo-sensor-msgs, ros-indigo-std-msgs
+Homepage: http://wiki.ros.org/usb_cam
+Standards-Version: 3.9.2
+
+Package: ros-indigo-usb-cam
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libavcodec-dev, libavformat-dev, libavutil-dev, libswscale-dev, ros-indigo-camera-info-manager, ros-indigo-image-transport, ros-indigo-roscpp, ros-indigo-sensor-msgs, ros-indigo-std-msgs
+Description: A ROS Driver for V4L USB Cameras
