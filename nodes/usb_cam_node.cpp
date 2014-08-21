@@ -39,6 +39,7 @@
 #include <usb_cam/usb_cam.h>
 #include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
+#include <sstream>
 
 class UsbCamNode
 {
@@ -52,13 +53,9 @@ public:
   image_transport::CameraPublisher image_pub_;
 
   // parameters
-  std::string video_device_name_;
-  std::string io_method_name_;
-  int image_width_, image_height_, framerate_;
-  std::string pixel_format_name_;
-  bool autofocus_;
-  std::string camera_name_;
-  std::string camera_info_url_;
+  std::string video_device_name_, io_method_name_, pixel_format_name_, camera_name_, camera_info_url_;
+  int image_width_, image_height_, framerate_, exposure_;
+  bool autofocus_, autoexposure_;
   boost::shared_ptr<camera_info_manager::CameraInfoManager> cinfo_;
 
   UsbCamNode() :
@@ -75,10 +72,13 @@ public:
     node_.param("image_width", image_width_, 640);
     node_.param("image_height", image_height_, 480);
     node_.param("framerate", framerate_, 30);
-    // possible values: yuyv, uyvy, mjpeg, yuvmono10
+    // possible values: yuyv, uyvy, mjpeg, yuvmono10, rgb24
     node_.param("pixel_format", pixel_format_name_, std::string("mjpeg"));
     // enable/disable autofocus
     node_.param("autofocus", autofocus_, false);
+    // enable/disable autoexposure
+    node_.param("autoexposure", autoexposure_, true);
+    node_.param("exposure", exposure_, 100);
 
     // load the camera info
     node_.param("camera_frame_id", img_.header.frame_id, std::string("head_camera"));
@@ -86,15 +86,8 @@ public:
     node_.param("camera_info_url", camera_info_url_, std::string(""));
     cinfo_.reset(new camera_info_manager::CameraInfoManager(node_, camera_name_, camera_info_url_));
 
-    ROS_INFO("Camera name: %s", camera_name_.c_str());
-    ROS_INFO("Camera frame: %s", img_.header.frame_id.c_str());
-    ROS_INFO("Camera info url: %s", camera_info_url_.c_str());
-    ROS_INFO("usb_cam video_device set to [%s]\n", video_device_name_.c_str());
-    ROS_INFO("usb_cam io_method set to [%s]\n", io_method_name_.c_str());
-    ROS_INFO("usb_cam image_width set to [%d]\n", image_width_);
-    ROS_INFO("usb_cam image_height set to [%d]\n", image_height_);
-    ROS_INFO("usb_cam pixel_format set to [%s]\n", pixel_format_name_.c_str());
-    ROS_INFO("usb_cam autofocus set to [%d]\n", autofocus_);
+    ROS_INFO("Starting '%s' (%s) at %dx%d via %s (%s)", camera_name_.c_str(), video_device_name_.c_str(), image_width_,
+             image_height_, io_method_name_.c_str(), pixel_format_name_.c_str());
 
     // set the IO method
     usb_cam_io_method io_method;
@@ -121,6 +114,8 @@ public:
       pixel_format = PIXEL_FORMAT_MJPEG;
     else if (pixel_format_name_ == "yuvmono10")
       pixel_format = PIXEL_FORMAT_YUVMONO10;
+    else if (pixel_format_name_ == "rgb24")
+      pixel_format = PIXEL_FORMAT_RGB24;
     else
     {
       ROS_FATAL("Unknown pixel format '%s'", pixel_format_name_.c_str());
@@ -134,7 +129,21 @@ public:
 
     // check auto focus
     if (autofocus_)
+    {
       usb_cam_camera_set_auto_focus(1);
+      this->set_v4l_parameters(video_device_name_, "focus_auto=1");
+    }
+
+    // check auto exposure
+    if (!autoexposure_)
+    {
+      // turn down exposure control (from max of 3)
+      this->set_v4l_parameters(video_device_name_, "exposure_auto=1");
+      // change the exposure level
+      std::stringstream ss;
+      ss << "exposure_absolute=" << exposure_;
+      this->set_v4l_parameters(video_device_name_, ss.str());
+    }
   }
 
   virtual ~UsbCamNode()
@@ -171,6 +180,40 @@ public:
       ros::spinOnce();
     }
     return true;
+  }
+
+private:
+
+  /**
+   * Set video device parameters via calls to v4l-utils.
+   *
+   * @param dev The device (e.g., "/dev/video0")
+   * @param param The full parameter to set (e.g., "focus_auto=1")
+   */
+  void set_v4l_parameters(std::string dev, std::string param)
+  {
+    // build the command
+    std::stringstream ss;
+    ss << "v4l2-ctl --device=" << dev << " -c " << param << " 2>&1";
+    std::string cmd = ss.str();
+
+    // capture the output
+    std::string output;
+    int buffer_size = 256;
+    char buffer[buffer_size];
+    FILE *stream = popen(cmd.c_str(), "r");
+    if (stream)
+    {
+      while (!feof(stream))
+        if (fgets(buffer, buffer_size, stream) != NULL)
+          output.append(buffer);
+      pclose(stream);
+      // any output should be an error
+      if (output.length() > 0)
+        ROS_WARN("%s", output.c_str());
+    }
+    else
+      ROS_WARN("usb_cam_node could not run '%s'", cmd.c_str());
   }
 };
 
