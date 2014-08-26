@@ -1,3 +1,24 @@
+## usb_cam (hydro) - 0.1.9-0
+
+The packages in the `usb_cam` repository were released into the `hydro` distro by running `/usr/bin/bloom-release --rosdistro hydro --track hydro usb_cam` on `Tue, 26 Aug 2014 13:01:38 -0000`
+
+The `usb_cam` package was released.
+
+Version of package(s) in repository `usb_cam`:
+- upstream repository: https://github.com/bosch-ros-pkg/usb_cam.git
+- release repository: https://github.com/bosch-ros-pkg-release/usb_cam-release.git
+- rosdistro version: `0.1.8-0`
+- old version: `0.1.8-0`
+- new version: `0.1.9-0`
+
+Versions of tools used:
+- bloom version: `0.5.11`
+- catkin_pkg version: `0.2.4`
+- rosdep version: `0.10.30`
+- rosdistro version: `0.3.5`
+- vcstools version: `0.1.35`
+
+
 ## usb_cam (indigo) - 0.1.9-0
 
 The packages in the `usb_cam` repository were released into the `indigo` distro by running `/usr/bin/bloom-release --rosdistro indigo --track indigo usb_cam` on `Tue, 26 Aug 2014 13:00:39 -0000`
