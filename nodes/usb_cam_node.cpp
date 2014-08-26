@@ -86,8 +86,8 @@ public:
     node_.param("camera_info_url", camera_info_url_, std::string(""));
     cinfo_.reset(new camera_info_manager::CameraInfoManager(node_, camera_name_, camera_info_url_));
 
-    ROS_INFO("Starting '%s' (%s) at %dx%d via %s (%s)", camera_name_.c_str(), video_device_name_.c_str(), image_width_,
-             image_height_, io_method_name_.c_str(), pixel_format_name_.c_str());
+    ROS_INFO("Starting '%s' (%s) at %dx%d via %s (%s) at %i FPS", camera_name_.c_str(), video_device_name_.c_str(),
+             image_width_, image_height_, io_method_name_.c_str(), pixel_format_name_.c_str(), framerate_);
 
     // set the IO method
     usb_cam_io_method io_method;
@@ -168,16 +168,19 @@ public:
 
     // publish the image
     image_pub_.publish(img_, *ci);
+
     return true;
   }
 
   bool spin()
   {
+    ros::Rate loop_rate(this->framerate_);
     while (node_.ok())
     {
       if (!take_and_send_image())
         ROS_WARN("USB camera did not respond in time.");
       ros::spinOnce();
+      loop_rate.sleep();
     }
     return true;
   }
