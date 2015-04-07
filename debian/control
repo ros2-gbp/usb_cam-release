@@ -1,0 +1,12 @@
+Source: ros-jade-usb-cam
+Section: misc
+Priority: extra
+Maintainer: Russell Toris <rctoris@wpi.edu>
+Build-Depends: debhelper (>= 9.0.0), libavcodec-dev, libavformat-dev, libavutil-dev, libswscale-dev, ros-jade-camera-info-manager, ros-jade-catkin, ros-jade-image-transport, ros-jade-roscpp, ros-jade-sensor-msgs, ros-jade-std-msgs
+Homepage: http://wiki.ros.org/usb_cam
+Standards-Version: 3.9.2
+
+Package: ros-jade-usb-cam
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libavcodec-dev, libavformat-dev, libavutil-dev, libswscale-dev, ros-jade-camera-info-manager, ros-jade-image-transport, ros-jade-roscpp, ros-jade-sensor-msgs, ros-jade-std-msgs, v4l-utils
+Description: A ROS Driver for V4L USB Cameras
