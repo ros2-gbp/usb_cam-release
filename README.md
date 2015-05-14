@@ -1,3 +1,24 @@
+## usb_cam (jade) - 0.3.3-0
+
+The packages in the `usb_cam` repository were released into the `jade` distro by running `/usr/bin/bloom-release --rosdistro jade --track jade usb_cam` on `Thu, 14 May 2015 17:15:17 -0000`
+
+The `usb_cam` package was released.
+
+Version of package(s) in repository `usb_cam`:
+- upstream repository: https://github.com/bosch-ros-pkg/usb_cam.git
+- release repository: https://github.com/bosch-ros-pkg-release/usb_cam-release.git
+- rosdistro version: `0.3.2-0`
+- old version: `0.3.2-0`
+- new version: `0.3.3-0`
+
+Versions of tools used:
+- bloom version: `0.5.20`
+- catkin_pkg version: `0.2.8`
+- rosdep version: `0.11.2`
+- rosdistro version: `0.4.2`
+- vcstools version: `0.1.36`
+
+
 ## usb_cam (indigo) - 0.3.3-0
 
 The packages in the `usb_cam` repository were released into the `indigo` distro by running `/usr/bin/bloom-release --rosdistro indigo --track indigo usb_cam` on `Thu, 14 May 2015 17:14:23 -0000`
