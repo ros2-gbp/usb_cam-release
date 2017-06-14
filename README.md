@@ -1,3 +1,26 @@
+## usb_cam (kinetic) - 0.3.5-0
+
+The packages in the `usb_cam` repository were released into the `kinetic` distro by running `/home/k-okada/catkin_ws/ws_rosdep/bloom/devel/bin/bloom-release usb_cam --rosdistro kinetic --track kinetic --edit` on `Wed, 14 Jun 2017 07:07:10 -0000`
+
+The `usb_cam` package was released.
+
+Version of package(s) in repository `usb_cam`:
+
+- upstream repository: https://github.com/ros-drivers/usb_cam.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `0.3.5-0`
+
+Versions of tools used:
+
+- bloom version: `0.5.26`
+- catkin_pkg version: `0.3.1`
+- rosdep version: `0.11.5`
+- rosdistro version: `0.6.2`
+- vcstools version: `0.1.39`
+
+
 ## usb_cam (hydro) - 0.3.4-0
 
 The packages in the `usb_cam` repository were released into the `hydro` distro by running `/usr/bin/bloom-release --rosdistro hydro --track hydro usb_cam` on `Tue, 18 Aug 2015 14:16:03 -0000`
