@@ -1,3 +1,26 @@
+## usb_cam (lunar) - 0.3.6-0
+
+The packages in the `usb_cam` repository were released into the `lunar` distro by running `/usr/bin/bloom-release usb_cam --rosdistro lunar --track lunar` on `Thu, 15 Jun 2017 00:08:09 -0000`
+
+The `usb_cam` package was released.
+
+Version of package(s) in repository `usb_cam`:
+
+- upstream repository: https://github.com/ros-drivers/usb_cam.git
+- release repository: https://github.com/ros-gbp/usb_cam-release.git
+- rosdistro version: `0.3.5-0`
+- old version: `0.3.5-0`
+- new version: `0.3.6-0`
+
+Versions of tools used:
+
+- bloom version: `0.5.26`
+- catkin_pkg version: `0.3.4`
+- rosdep version: `0.11.5`
+- rosdistro version: `0.6.2`
+- vcstools version: `0.1.39`
+
+
 ## usb_cam (lunar) - 0.3.5-0
 
 The packages in the `usb_cam` repository were released into the `lunar` distro by running `/home/k-okada/catkin_ws/ws_rosdep/bloom/devel/bin/bloom-release usb_cam --rosdistro lunar --track lunar --edit` on `Wed, 14 Jun 2017 07:27:39 -0000`
