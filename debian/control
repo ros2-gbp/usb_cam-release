@@ -1,0 +1,12 @@
+Source: ros-melodic-usb-cam
+Section: misc
+Priority: extra
+Maintainer: Russell Toris <rctoris@wpi.edu>
+Build-Depends: debhelper (>= 9.0.0), libavcodec-dev, libavformat-dev, libavutil-dev, libswscale-dev, ros-melodic-camera-info-manager, ros-melodic-catkin, ros-melodic-image-transport, ros-melodic-roscpp, ros-melodic-sensor-msgs, ros-melodic-std-msgs, ros-melodic-std-srvs
+Homepage: http://wiki.ros.org/usb_cam
+Standards-Version: 3.9.2
+
+Package: ros-melodic-usb-cam
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libavcodec-dev, libavformat-dev, libavutil-dev, libswscale-dev, ros-melodic-camera-info-manager, ros-melodic-image-transport, ros-melodic-roscpp, ros-melodic-sensor-msgs, ros-melodic-std-msgs, ros-melodic-std-srvs, v4l-utils
+Description: A ROS Driver for V4L USB Cameras
