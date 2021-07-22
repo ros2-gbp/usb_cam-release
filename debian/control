@@ -1,0 +1,12 @@
+Source: ros-galactic-usb-cam
+Section: misc
+Priority: optional
+Maintainer: Evan Flynn <evanflynn.msu@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), ffmpeg, libavcodec-dev, libavformat-dev, libavutil-dev, libswscale-dev, ros-galactic-ament-cmake-auto, ros-galactic-ament-lint-auto, ros-galactic-ament-lint-common, ros-galactic-builtin-interfaces, ros-galactic-camera-info-manager, ros-galactic-image-transport, ros-galactic-rclcpp, ros-galactic-rclcpp-components, ros-galactic-rosidl-default-generators, ros-galactic-sensor-msgs, ros-galactic-std-msgs, ros-galactic-std-srvs, v4l-utils, ros-galactic-ros-workspace, ros-galactic-rosidl-typesupport-fastrtps-c, ros-galactic-rosidl-typesupport-fastrtps-cpp
+Homepage: http://wiki.ros.org/usb_cam
+Standards-Version: 3.9.2
+
+Package: ros-galactic-usb-cam
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ffmpeg, libavcodec-dev, libavformat-dev, libavutil-dev, libswscale-dev, ros-galactic-builtin-interfaces, ros-galactic-camera-info-manager, ros-galactic-image-transport, ros-galactic-rclcpp, ros-galactic-rclcpp-components, ros-galactic-rosidl-default-runtime, ros-galactic-sensor-msgs, ros-galactic-std-msgs, ros-galactic-std-srvs, v4l-utils, ros-galactic-ros-workspace
+Description: A ROS2 Driver for V4L USB Cameras
