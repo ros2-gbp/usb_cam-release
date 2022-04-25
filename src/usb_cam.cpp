@@ -119,11 +119,11 @@ int UsbCam::init_mjpeg_decoder(int image_width, int image_height)
   return 1;
 }
 
-bool UsbCam::mjpeg2rgb(char * MJPEG, int len, char * RGB, int NumPixels)
+bool UsbCam::mjpeg2rgb(char * MJPEG, int len, char * RGB, int /* NumPixels */)
 {
   // RCLCPP_INFO_STREAM(
   //   rclcpp::get_logger("usb_cam"),
-  //     "mjpeg2rgb " << len << ", image 0x" << std::hex << (unsigned long int)RGB \
+  //     "mjpeg2rgb " << len << ", image 0x" << std::hex << (unsigned long int)RGB
   //     << std::dec << " " << NumPixels << ", avframe_rgb_size_ " << avframe_rgb_size_);
   int got_picture;
 
@@ -169,7 +169,7 @@ bool UsbCam::mjpeg2rgb(char * MJPEG, int len, char * RGB, int NumPixels)
 
   // TODO(lucasw) why does the image need to be scaled?  Does it also convert formats?
   // RCLCPP_INFO_STREAM(
-  //   rclcpp::get_logger("usb_cam"), "sw scaler " << xsize << " " << ysize << " " \
+  //   rclcpp::get_logger("usb_cam"), "sw scaler " << xsize << " " << ysize << " "
   //     << avcodec_context_->pix_fmt << ", linesize " << avframe_rgb_->linesize);
   #if 1
   avcodec_context_->pix_fmt = pix_fmt_backup;
@@ -356,6 +356,10 @@ bool UsbCam::read_frame()
 
       image_->stamp = stamp;
       break;
+
+    default:
+      std::cerr << "Unknown io type " << io_ << std::endl;
+      return false;
   }
 
   return true;
@@ -388,6 +392,10 @@ bool UsbCam::stop_capturing(void)
       }
 
       break;
+
+    default:
+      std::cerr << "Unknown io type " << io_ << std::endl;
+      return false;
   }
   return true;
 }
@@ -454,6 +462,10 @@ bool UsbCam::start_capturing(void)
       }
 
       break;
+
+    default:
+      std::cerr << "Unknown io type " << io_ << std::endl;
+      return false;
   }
   is_capturing_ = true;
   return true;
@@ -482,6 +494,10 @@ bool UsbCam::uninit_device(void)
         free(buffers_[i].start);
       }
       break;
+
+    default:
+      std::cerr << "Unknown io type " << io_ << std::endl;
+      return false;
   }
 
   free(buffers_);
@@ -616,7 +632,7 @@ bool UsbCam::init_userp(unsigned int buffer_size)
   return true;
 }
 
-bool UsbCam::init_device(int image_width, int image_height, int framerate)
+bool UsbCam::init_device(uint32_t image_width, uint32_t image_height, int framerate)
 {
   struct v4l2_capability cap;
   struct v4l2_cropcap cropcap;
@@ -664,6 +680,10 @@ bool UsbCam::init_device(int image_width, int image_height, int framerate)
       }
 
       break;
+
+    default:
+      std::cerr << "Unknown io type " << io_ << std::endl;
+      return false;
   }
 
   /* Select video input, video standard and tune here. */
@@ -692,12 +712,6 @@ bool UsbCam::init_device(int image_width, int image_height, int framerate)
 
   CLEAR(fmt);
 
-//  fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-//  fmt.fmt.pix.width = 640;
-//  fmt.fmt.pix.height = 480;
-//  fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
-//  fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
-
   fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   fmt.fmt.pix.width = image_width;
   fmt.fmt.pix.height = image_height;
@@ -705,8 +719,34 @@ bool UsbCam::init_device(int image_width, int image_height, int framerate)
   fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
 
   if (-1 == xioctl(fd_, VIDIOC_S_FMT, &fmt)) {
-    std::cerr << "error, quitting, TODO throw " << errno << std::endl;
-    return false;  // ("VIDIOC_S_FMT");
+    /* Check if selected format is already active - some hardware e.g. droidcam do not support setting values via VIDIOC_S_FMT*/
+    CLEAR(fmt);
+
+    fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+    if (xioctl(fd_, VIDIOC_G_FMT, &fmt) >= 0) {
+      RCLCPP_ERROR_STREAM(
+          rclcpp::get_logger("usb_cam"),
+          camera_dev_ << " does not support setting format options.");
+      RCLCPP_ERROR_STREAM(
+          rclcpp::get_logger("usb_cam"),
+          camera_dev_ << " supports: \n \t Width/Height \t : "<<fmt.fmt.pix.width<<"/"<<fmt.fmt.pix.height<<"\n"
+                      <<"\t Pixel Format \t : "<<fcc2s(fmt.fmt.pix.pixelformat));
+
+      if(fmt.fmt.pix.pixelformat == pixelformat_ &&
+        fmt.fmt.pix.width == image_width &&
+        fmt.fmt.pix.height == image_height) {
+        RCLCPP_ERROR_STREAM(
+          rclcpp::get_logger("usb_cam"),
+          "Selected format '"<< fcc2s(fmt.fmt.pix.pixelformat) <<"' is the same as the camera supports. Starting node...");
+      } else {
+        std::cerr << "error, quitting, TODO throw " << errno << std::endl;
+        return false; // ("VIDIOC_S_FMT");
+      }
+    } else {
+      std::cerr << "error, quitting, TODO throw " << errno << std::endl;
+      return false;  // ("VIDIOC_S_FMT");
+    }
   }
 
   /* Note VIDIOC_S_FMT may change width and height. */
@@ -735,7 +775,7 @@ bool UsbCam::init_device(int image_width, int image_height, int framerate)
   RCLCPP_INFO_STREAM(
     rclcpp::get_logger("usb_cam"),
     "Capability flag: 0x" << std::hex << stream_params.parm.capture.capability << std::dec);
-  if (!stream_params.parm.capture.capability & V4L2_CAP_TIMEPERFRAME) {
+  if (!(stream_params.parm.capture.capability & V4L2_CAP_TIMEPERFRAME)) {
     RCLCPP_ERROR(rclcpp::get_logger("usb_cam"), "V4L2_CAP_TIMEPERFRAME not supported");
   }
 
@@ -761,6 +801,10 @@ bool UsbCam::init_device(int image_width, int image_height, int framerate)
     case IO_METHOD_USERPTR:
       init_userp(fmt.fmt.pix.sizeimage);
       break;
+
+    default:
+      std::cerr << "Unknown io type " << io_ << std::endl;
+      return false;
   }
   return true;
 }
@@ -805,7 +849,7 @@ bool UsbCam::open_device(void)
 
 bool UsbCam::start(
   const std::string & dev, io_method io_method, pixel_format pixel_format,
-  int image_width, int image_height, int framerate)
+  uint32_t image_width, uint32_t image_height, int framerate)
 {
   camera_dev_ = dev;
 
@@ -1080,6 +1124,7 @@ bool UsbCam::set_v4l_parameter(const std::string & param, const std::string & va
   } else {
     RCLCPP_WARN(rclcpp::get_logger("usb_cam"), "usb_cam_node could not run '%s'", cmd.c_str());
   }
+  return true;
 }
 
 UsbCam::io_method UsbCam::io_method_from_string(const std::string & str)
