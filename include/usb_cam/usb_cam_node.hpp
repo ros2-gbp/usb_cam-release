@@ -1,4 +1,5 @@
 // Copyright 2021 Evan Flynn
+// Copyright 2014 Robert Bosch, LLC
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -29,18 +30,19 @@
 
 #ifndef USB_CAM__USB_CAM_NODE_HPP_
 #define USB_CAM__USB_CAM_NODE_HPP_
-#include "usb_cam/usb_cam.hpp"
-
-
-#include <rclcpp/rclcpp.hpp>
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "camera_info_manager/camera_info_manager.hpp"
 #include "image_transport/image_transport.hpp"
+#include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
 #include "std_srvs/srv/set_bool.hpp"
+
+#include "usb_cam/usb_cam.hpp"
+
 
 std::ostream & operator<<(std::ostream & ostr, const rclcpp::Time & tm)
 {
@@ -56,13 +58,17 @@ namespace usb_cam
 class UsbCamNode : public rclcpp::Node
 {
 public:
-  UsbCamNode(const rclcpp::NodeOptions & node_options);
+  explicit UsbCamNode(const rclcpp::NodeOptions & node_options);
   ~UsbCamNode();
 
   void init();
   void get_params();
+  void assign_params(const std::vector<rclcpp::Parameter> & parameters);
   void update();
   bool take_and_send_image();
+
+  rcl_interfaces::msg::SetParametersResult parametersCallback(
+    const std::vector<rclcpp::Parameter> & parameters);
 
   void service_capture(
     const std::shared_ptr<rmw_request_id_t> request_header,
@@ -85,6 +91,7 @@ public:
   // to discover them,
   // or guvcview
   std::string pixel_format_name_;
+  std::string color_format_name_;
   int image_width_;
   int image_height_;
   int framerate_;
@@ -101,6 +108,7 @@ public:
   rclcpp::TimerBase::SharedPtr timer_;
 
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr service_capture_;
+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr parameters_callback_handle_;
 };
 }  // namespace usb_cam
 #endif  // USB_CAM__USB_CAM_NODE_HPP_
