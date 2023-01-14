@@ -19,7 +19,7 @@ For either MacOS or Windows - if you would like to try and get it working please
 Assuming you have a supported ROS2 distro installed, run the following command to install the binary release:
 
 ```bash
-sudo apt get install ros-<ros2-distro>-usb-cam
+sudo apt-get install ros-<ros2-distro>-usb-cam
 ```
 
 As of today this package should be available for binary installation on all active ROS2 distros.
@@ -97,7 +97,7 @@ The `usb_cam` should support compression by default since it uses `image_transpo
 Unfortunately `rviz2` and `show_image.py` do not support visualizing the compressed images just yet so you will need to republish the compressed image downstream to uncompress it:
 
 ```
-ros2 run image_transport republish compressed in/compressed:=image_raw/compressed raw out:=image_raw/uncompressed
+ros2 run image_transport republish compressed raw --ros-args --remap in/compressed:=image_raw/compressed --remap out:=image_raw/uncompressed
 ```
 
 #### Documentation
