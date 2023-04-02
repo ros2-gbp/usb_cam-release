@@ -1,5 +1,4 @@
 // Copyright 2023 Evan Flynn
-// Copyright 2014 Robert Bosch, LLC
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -28,38 +27,23 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 
-#ifndef USB_CAM__CONVERSIONS_HPP_
-#define USB_CAM__CONVERSIONS_HPP_
+#include <gtest/gtest.h>
 
-#include <string>
+#include <linux/videodev2.h>
 
-#include "opencv2/imgproc.hpp"
+#include "usb_cam/formats/pixel_format_base.hpp"
 
-#include "usb_cam/constants.hpp"
-#include "usb_cam/utils.hpp"
+TEST(test_pixel_formats, pixel_format_base_class) {
+  auto test_pix_fmt = usb_cam::formats::default_pixel_format();
 
+  EXPECT_EQ(test_pix_fmt.name(), "yuyv");
+  EXPECT_EQ(test_pix_fmt.v4l2(), V4L2_PIX_FMT_YUYV);
+  EXPECT_EQ(test_pix_fmt.channels(), 2);
+  EXPECT_EQ(test_pix_fmt.bit_depth(), 8);
+  EXPECT_EQ(test_pix_fmt.requires_conversion(), false);
 
-namespace usb_cam
-{
-namespace conversions
-{
-
-
-std::string FCC2S(const unsigned int & val)
-{
-  std::string s;
-
-  s += val & 0x7f;
-  s += (val >> 8) & 0x7f;
-  s += (val >> 16) & 0x7f;
-  s += (val >> 24) & 0x7f;
-  if (val & (1 << 31)) {
-    s += "-BE";
-  }
-  return s;
+  EXPECT_EQ(test_pix_fmt.is_bayer(), false);
+  // TOOD(flynneva): should this be true for `yuyv`?
+  EXPECT_EQ(test_pix_fmt.is_color(), false);
+  EXPECT_EQ(test_pix_fmt.is_mono(), false);
 }
-
-}  // namespace conversions
-}  // namespace usb_cam
-
-#endif  // USB_CAM__CONVERSIONS_HPP_
