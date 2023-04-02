@@ -1,5 +1,4 @@
 // Copyright 2023 Evan Flynn
-// Copyright 2014 Robert Bosch, LLC
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -28,38 +27,35 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 
-#ifndef USB_CAM__CONVERSIONS_HPP_
-#define USB_CAM__CONVERSIONS_HPP_
+#ifndef USB_CAM__FORMATS__RGB_HPP_
+#define USB_CAM__FORMATS__RGB_HPP_
 
-#include <string>
+#include "linux/videodev2.h"
 
-#include "opencv2/imgproc.hpp"
-
-#include "usb_cam/constants.hpp"
-#include "usb_cam/utils.hpp"
+#include "usb_cam/formats/pixel_format_base.hpp"
+#include "usb_cam/formats/utils.hpp"
 
 
 namespace usb_cam
 {
-namespace conversions
+namespace formats
 {
 
-
-std::string FCC2S(const unsigned int & val)
+class RGB8 : public pixel_format_base
 {
-  std::string s;
+public:
+  RGB8()
+  : pixel_format_base(
+      "rgb8",
+      V4L2_PIX_FMT_RGB332,
+      usb_cam::constants::RGB8,
+      3,
+      8,
+      false)
+  {}
+};
 
-  s += val & 0x7f;
-  s += (val >> 8) & 0x7f;
-  s += (val >> 16) & 0x7f;
-  s += (val >> 24) & 0x7f;
-  if (val & (1 << 31)) {
-    s += "-BE";
-  }
-  return s;
-}
-
-}  // namespace conversions
+}  // namespace formats
 }  // namespace usb_cam
 
-#endif  // USB_CAM__CONVERSIONS_HPP_
+#endif  // USB_CAM__FORMATS__RGB_HPP_
