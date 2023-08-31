@@ -1,3 +1,26 @@
+## usb_cam (iron) - 0.7.0-1
+
+The packages in the `usb_cam` repository were released into the `iron` distro by running `/usr/bin/bloom-release --rosdistro iron --track iron usb_cam` on `Thu, 31 Aug 2023 03:15:38 -0000`
+
+The `usb_cam` package was released.
+
+Version of package(s) in repository `usb_cam`:
+
+- upstream repository: https://github.com/ros-drivers/usb_cam.git
+- release repository: https://github.com/ros2-gbp/usb_cam-release.git
+- rosdistro version: `0.6.0-2`
+- old version: `0.6.0-2`
+- new version: `0.7.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.11.2`
+- catkin_pkg version: `0.5.2`
+- rosdep version: `0.22.2`
+- rosdistro version: `0.9.0`
+- vcstools version: `0.1.42`
+
+
 ## usb_cam (humble) - 0.7.0-1
 
 The packages in the `usb_cam` repository were released into the `humble` distro by running `/usr/bin/bloom-release --rosdistro humble --track humble usb_cam` on `Thu, 31 Aug 2023 03:06:21 -0000`
