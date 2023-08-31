@@ -66,6 +66,34 @@ typedef struct
   struct v4l2_frmivalenum v4l2_fmt;
 } capture_format_t;
 
+typedef struct
+{
+  std::string camera_name;  // can be anything
+  std::string device_name;  // usually /dev/video0 or something similiar
+  std::string frame_id;
+  std::string io_method_name;
+  std::string camera_info_url;
+  // these parameters all have to be a combination supported by the device
+  // Use
+  // v4l2-ctl --device=0 --list-formats-ext
+  // to discover them,
+  // or guvcview
+  std::string pixel_format_name;
+  int image_width;
+  int image_height;
+  int framerate;
+  int brightness;
+  int contrast;
+  int saturation;
+  int sharpness;
+  int gain;
+  int white_balance;
+  int exposure;
+  int focus;
+  bool auto_white_balance;
+  bool autoexposure;
+  bool autofocus;
+} parameters_t;
 
 typedef struct
 {
@@ -109,9 +137,7 @@ public:
   ~UsbCam();
 
   /// @brief Configure device, should be called before start
-  void configure(
-    const std::string & dev, const io_method_t & io_method, const std::string & pixel_format_str,
-    const uint32_t & image_width, const uint32_t & image_height, const int & framerate);
+  void configure(parameters_t & parameters, const io_method_t & io_method);
 
   /// @brief Start the configured device
   void start();
@@ -153,9 +179,14 @@ public:
     return m_image.height;
   }
 
-  inline size_t get_image_size()
+  inline size_t get_image_size_in_bytes()
   {
     return m_image.size_in_bytes;
+  }
+
+  inline size_t get_image_size_in_pixels()
+  {
+    return m_image.number_of_pixels;
   }
 
   inline timespec get_image_timestamp()
@@ -170,9 +201,9 @@ public:
     return m_image.bytes_per_line;
   }
 
-  inline std::string get_camera_dev()
+  inline std::string get_device_name()
   {
-    return m_camera_dev;
+    return m_device_name;
   }
 
   inline std::shared_ptr<pixel_format_base> get_pixel_format()
@@ -190,7 +221,7 @@ public:
     return m_fd;
   }
 
-  inline usb_cam::utils::buffer * get_buffers()
+  inline std::shared_ptr<usb_cam::utils::buffer[]> get_buffers()
   {
     return m_buffers;
   }
@@ -225,9 +256,9 @@ public:
     return m_is_capturing;
   }
 
-  inline time_t get_epoch_time_shift()
+  inline time_t get_epoch_time_shift_us()
   {
-    return m_epoch_time_shift;
+    return m_epoch_time_shift_us;
   }
 
   inline std::vector<capture_format_t> supported_formats()
@@ -302,16 +333,13 @@ private:
   void uninit_device();
   void close_device();
 
-  std::string m_camera_dev;
+  std::string m_device_name;
   usb_cam::utils::io_method_t m_io;
   int m_fd;
-  usb_cam::utils::buffer * m_buffers;
   unsigned int m_number_of_buffers;
+  std::shared_ptr<usb_cam::utils::buffer[]> m_buffers;
   image_t m_image;
 
-  // Only used for MJPEG to RGB conversion using ffmpeg utilities
-  /// @brief Initialize ffmpeg utilities to decode the image
-  void init_decoder();
   AVFrame * m_avframe;
   int m_avframe_size;
   AVCodec * m_avcodec;
@@ -319,10 +347,10 @@ private:
   AVDictionary * m_avoptions;
   AVCodecContext * m_avcodec_context;
 
-  int64_t m_buffer_time_s;
+  int64_t m_buffer_time_us;
   bool m_is_capturing;
   int m_framerate;
-  const time_t m_epoch_time_shift;
+  const time_t m_epoch_time_shift_us;
   std::vector<capture_format_t> m_supported_formats;
 };
 
