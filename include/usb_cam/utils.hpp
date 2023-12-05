@@ -29,25 +29,29 @@
 #ifndef USB_CAM__UTILS_HPP_
 #define USB_CAM__UTILS_HPP_
 
+extern "C" {
+#include <fcntl.h>  // for open()
+}
+
 #include <sys/ioctl.h>
 #include <sys/time.h>
+#include <unistd.h>  // for access
 #include <cmath>
 #include <ctime>
 #include <cstring>
 #include <sstream>
 #include <string>
+#include <map>
 
 #include "linux/videodev2.h"
 
 #include "usb_cam/constants.hpp"
-#include "usb_cam/formats/pixel_format_base.hpp"
+
 
 namespace usb_cam
 {
 namespace utils
 {
-
-using usb_cam::formats::pixel_format_base;
 
 
 /// @brief Read more on IO methods here: https://lwn.net/Articles/240667/
@@ -130,6 +134,47 @@ inline io_method_t io_method_from_string(const std::string & str)
   } else {
     return io_method_t::IO_METHOD_UNKNOWN;
   }
+}
+
+/// \brief List currently available valid V4L2 devices
+///   Can be used to check if a device string is valid before
+///   starting up.
+///
+///   Inspired by: http://stackoverflow.com/questions/4290834/how-to-get-a-list-of-video-capture-devices-web-cameras-on-linux-ubuntu-c
+inline std::map<std::string, v4l2_capability> available_devices()
+{
+  // Initialize vector of device strings to fill in
+  std::map<std::string, v4l2_capability> v4l2_devices;
+
+  // V4L2 spec says there can only be a maximum of 64 devices
+  const uint8_t MAX_DEVICES = 64;
+
+  for (uint8_t i = 0; i < MAX_DEVICES; i++) {
+    std::string device_str = "/dev/video" + std::to_string(i);
+    // See if device exists
+    if (access(device_str.c_str(), F_OK) != -1) {
+      int fd;
+      // Try and open device to test access
+      if ((fd = open(device_str.c_str(), O_RDONLY)) == -1) {
+        std::cerr << "Cannot open device: `" << device_str << "`, ";
+        std::cerr << "double-check read / write permissions for device" << std::endl;
+      } else {
+        struct v4l2_capability device_capabilities = {};
+
+        if (xioctl(fd, VIDIOC_QUERYCAP, &device_capabilities) == -1) {
+          std::cerr << "Could not retrieve device capabilities: `" << device_str;
+          std::cerr << "`" << std::endl;
+        } else {
+          v4l2_devices[device_str] = device_capabilities;
+        }
+      }
+    } else {
+      // device doesn't exist, break
+      break;
+    }
+  }
+
+  return v4l2_devices;
 }
 
 }  // namespace utils
