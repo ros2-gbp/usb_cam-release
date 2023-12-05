@@ -35,12 +35,27 @@
 #include "linux/videodev2.h"
 
 #include "usb_cam/constants.hpp"
-
+#include "usb_cam/conversions.hpp"
 
 namespace usb_cam
 {
 namespace formats
 {
+
+
+/// @brief Helper structure to standardize all pixel_format_base
+/// constructors, so that they all have the same argument type.
+///
+/// This should also be easily extendable in the future if we need to add additional
+/// arguments for future pixel format(s) that are added.
+typedef struct
+{
+  std::string name = "";
+  int width = 640;
+  int height = 480;
+  size_t pixels = 640 * 480;
+  std::string av_device_format_str = "AV_PIX_FMT_YUV422P";
+} format_arguments_t;
 
 
 /// @brief Base pixel format class. Provide all necessary information for converting between
@@ -64,8 +79,12 @@ public:
   inline std::string name() {return m_name;}
 
   /// @brief Integer value of V4L2 capture pixel format
-  /// @return
+  /// @return uint32_t V4L2 capture pixel format
   inline uint32_t v4l2() {return m_v4l2;}
+
+  /// @brief String value of V4L2 capture pixel format
+  /// @return std::string V4L2 capture pixel format
+  inline std::string v4l2_str() {return usb_cam::conversions::FCC2S(m_v4l2);}
 
   /// @brief Name of output pixel (encoding) format to ROS
   /// @return
@@ -78,6 +97,9 @@ public:
   /// @brief Number for bit depth of image
   /// @return
   inline uint8_t bit_depth() {return m_bit_depth;}
+
+  /// @brief Number of bytes per channel
+  inline uint8_t byte_depth() {return m_bit_depth / 8;}
 
   /// @brief True if the current pixel format requires a call to the `convert` method
   /// Used in the usb_cam library logic to determine if a plain `memcopy` call can be
