@@ -37,6 +37,7 @@ extern "C" {
 
 #include <chrono>
 #include <memory>
+#include <algorithm>
 #include <sstream>
 #include <iostream>
 #include <string>
@@ -44,6 +45,7 @@ extern "C" {
 
 #include "usb_cam/utils.hpp"
 #include "usb_cam/formats/pixel_format_base.hpp"
+#include "usb_cam/formats/av_pixel_format_helper.hpp"
 
 #include "usb_cam/formats/mjpeg.hpp"
 #include "usb_cam/formats/mono.hpp"
@@ -59,6 +61,40 @@ namespace usb_cam
 using usb_cam::utils::io_method_t;
 using usb_cam::formats::pixel_format_base;
 
+/// @brief Add more formats here and to driver_supported_formats below as
+/// they are added to this library
+using usb_cam::formats::RGB8;
+using usb_cam::formats::YUYV;
+using usb_cam::formats::YUYV2RGB;
+using usb_cam::formats::UYVY;
+using usb_cam::formats::UYVY2RGB;
+using usb_cam::formats::MONO8;
+using usb_cam::formats::MONO16;
+using usb_cam::formats::Y102MONO8;
+using usb_cam::formats::RAW_MJPEG;
+using usb_cam::formats::MJPEG2RGB;
+using usb_cam::formats::M4202RGB;
+
+
+/// @brief list all supported formats that this driver supports
+std::vector<std::shared_ptr<pixel_format_base>> driver_supported_formats(
+  const formats::format_arguments_t & args = formats::format_arguments_t())
+{
+  std::vector<std::shared_ptr<pixel_format_base>> fmts = {
+    std::make_shared<RGB8>(args),
+    std::make_shared<YUYV>(args),
+    std::make_shared<YUYV2RGB>(args),
+    std::make_shared<UYVY>(args),
+    std::make_shared<UYVY2RGB>(args),
+    std::make_shared<MONO8>(args),
+    std::make_shared<MONO16>(args),
+    std::make_shared<Y102MONO8>(args),
+    std::make_shared<RAW_MJPEG>(args),
+    std::make_shared<MJPEG2RGB>(args),
+    std::make_shared<M4202RGB>(args),
+  };
+  return fmts;
+}
 
 typedef struct
 {
@@ -79,6 +115,7 @@ typedef struct
   // to discover them,
   // or guvcview
   std::string pixel_format_name;
+  std::string av_device_format;
   int image_width;
   int image_height;
   int framerate;
@@ -114,12 +151,12 @@ typedef struct
   }
   size_t set_bytes_per_line()
   {
-    bytes_per_line = width * pixel_format->channels();
+    bytes_per_line = width * pixel_format->byte_depth() * pixel_format->channels();
     return bytes_per_line;
   }
   size_t set_size_in_bytes()
   {
-    size_in_bytes = width * height * pixel_format->channels();
+    size_in_bytes = height * bytes_per_line;
     return size_in_bytes;
   }
 
@@ -270,50 +307,73 @@ public:
     return m_supported_formats;
   }
 
-  /// @brief Get pixel format from string. Required to have logic within UsbCam object
+  /// @brief Check if the given format is supported by this device
+  /// If it is supported, set the m_pixel_format variable to it.
+  /// @param format the format to check if it is supported
+  /// @return bool true if the given format is supported, false otherwise
+  inline bool set_pixel_format(const formats::format_arguments_t & args)
+  {
+    bool result = false;
+
+    std::shared_ptr<pixel_format_base> found_driver_format = nullptr;
+
+    // First check if given format is supported by this driver
+    for (auto driver_fmt : driver_supported_formats(args)) {
+      if (driver_fmt->name() == args.name) {
+        found_driver_format = driver_fmt;
+      }
+    }
+
+    if (found_driver_format == nullptr) {
+      // List the supported formats of this driver for the user before throwing
+      std::cerr << "This driver supports the following formats:" << std::endl;
+      for (auto driver_fmt : driver_supported_formats(args)) {
+        std::cerr << "\t" << driver_fmt->name() << std::endl;
+      }
+      throw std::invalid_argument(
+              "Specified format `" + args.name + "` is unsupported by this ROS driver"
+      );
+    }
+
+    std::cout << "This device supports the following formats:" << std::endl;
+    for (auto fmt : this->supported_formats()) {
+      // Always list the devices supported formats for the user
+      std::cout << "\t" << fmt.format.description << " ";
+      std::cout << fmt.v4l2_fmt.width << " x " << fmt.v4l2_fmt.height << " (";
+      std::cout << fmt.v4l2_fmt.discrete.denominator / fmt.v4l2_fmt.discrete.numerator << " Hz)";
+      std::cout << std::endl;
+
+      if (fmt.v4l2_fmt.pixel_format == found_driver_format->v4l2()) {
+        result = true;
+        m_image.pixel_format = found_driver_format;
+      }
+    }
+
+    return result;
+  }
+
+  /// @brief Set pixel format from parameter list. Required to have logic within UsbCam object
   /// in case pixel format class requires additional information for conversion function
   /// (e.g. number of pixels, width, height, etc.)
-  /// @param str name of supported format (see `usb_cam/supported_formats.hpp`)
+  /// @param parameters list of parameters from which the pixel format is to be set
   /// @return pixel format structure corresponding to a given name
-  inline std::shared_ptr<pixel_format_base> set_pixel_format_from_string(const std::string & str)
+  inline std::shared_ptr<pixel_format_base> set_pixel_format(const parameters_t & parameters)
   {
-    using usb_cam::formats::RGB8;
-    using usb_cam::formats::YUYV;
-    using usb_cam::formats::YUYV2RGB;
-    using usb_cam::formats::UYVY;
-    using usb_cam::formats::UYVY2RGB;
-    using usb_cam::formats::MONO8;
-    using usb_cam::formats::MONO16;
-    using usb_cam::formats::Y102MONO8;
-    using usb_cam::formats::MJPEG2RGB;
-    using usb_cam::formats::M4202RGB;
+    // create format arguments structure
+    formats::format_arguments_t format_args({
+        parameters.pixel_format_name,
+        parameters.image_width,
+        parameters.image_height,
+        m_image.number_of_pixels,
+        parameters.av_device_format,
+      });
 
-    if (str == "rgb8") {
-      m_image.pixel_format = std::make_shared<RGB8>();
-    } else if (str == "yuyv") {
-      m_image.pixel_format = std::make_shared<YUYV>();
-    } else if (str == "yuyv2rgb") {
-      // number of pixels required for conversion method
-      m_image.pixel_format = std::make_shared<YUYV2RGB>(m_image.number_of_pixels);
-    } else if (str == "uyvy") {
-      m_image.pixel_format = std::make_shared<UYVY>();
-    } else if (str == "uyvy2rgb") {
-      // number of pixels required for conversion method
-      m_image.pixel_format = std::make_shared<UYVY2RGB>(m_image.number_of_pixels);
-    } else if (str == "mjpeg2rgb") {
-      m_image.pixel_format = std::make_shared<MJPEG2RGB>(
-        m_image.width, m_image.height);
-    } else if (str == "m4202rgb") {
-      m_image.pixel_format = std::make_shared<M4202RGB>(
-        m_image.width, m_image.height);
-    } else if (str == "mono8") {
-      m_image.pixel_format = std::make_shared<MONO8>();
-    } else if (str == "mono16") {
-      m_image.pixel_format = std::make_shared<MONO16>();
-    } else if (str == "y102mono8") {
-      m_image.pixel_format = std::make_shared<Y102MONO8>(m_image.number_of_pixels);
-    } else {
-      throw std::invalid_argument("Unsupported pixel format specified: " + str);
+    // Look for specified pixel format
+    if (!this->set_pixel_format(format_args)) {
+      throw std::invalid_argument(
+              "Specified format `" + parameters.pixel_format_name + "` is unsupported by the " +
+              "selected device `" + parameters.device_name + "`"
+      );
     }
 
     return m_image.pixel_format;
