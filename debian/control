@@ -1,0 +1,12 @@
+Source: ros-jazzy-usb-cam
+Section: misc
+Priority: optional
+Maintainer: Evan Flynn <evanflynn.msu@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), ament-cmake, ament-cmake-copyright <!nocheck>, ament-cmake-cppcheck <!nocheck>, ament-cmake-cpplint <!nocheck>, ament-cmake-flake8 <!nocheck>, ament-cmake-googletest <!nocheck>, ament-cmake-lint-cmake <!nocheck>, ament-cmake-pep257 <!nocheck>, ament-cmake-uncrustify <!nocheck>, ament-cmake-xmllint <!nocheck>, ament-lint <!nocheck>, ffmpeg, image-transport-tools, libavcodec-dev, libavformat-dev, libavutil-dev, libcamera-info-manager-dev, libcv-bridge-dev, libimage-transport-dev, libsensor-msgs-dev, libstd-msgs-dev, libstd-srvs-dev, libswscale-dev, python3-cv-bridge, python3-sensor-msgs, python3-std-msgs, python3-std-srvs, ros-environment, ros-jazzy-builtin-interfaces, ros-jazzy-image-transport-plugins, ros-jazzy-rclcpp, ros-jazzy-rclcpp-components, ros-jazzy-rosidl-default-generators, ros-sensor-msgs, ros-std-msgs, ros-std-srvs, v4l-utils, ros-jazzy-ros-workspace, ros-jazzy-rosidl-typesupport-fastrtps-c, ros-jazzy-rosidl-typesupport-fastrtps-cpp
+Homepage: http://wiki.ros.org/usb_cam
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-usb-cam
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ffmpeg, image-transport-tools, libavcodec-dev, libavformat-dev, libavutil-dev, libcamera-info-manager-dev, libcv-bridge-dev, libimage-transport-dev, libsensor-msgs-dev, libstd-msgs-dev, libstd-srvs-dev, libswscale-dev, python3-cv-bridge, python3-sensor-msgs, python3-std-msgs, python3-std-srvs, ros-jazzy-builtin-interfaces, ros-jazzy-image-transport-plugins, ros-jazzy-rclcpp, ros-jazzy-rclcpp-components, ros-jazzy-rosidl-default-runtime, ros-sensor-msgs, ros-std-msgs, ros-std-srvs, v4l-utils, ros-jazzy-ros-workspace
+Description: A ROS Driver for V4L USB Cameras
