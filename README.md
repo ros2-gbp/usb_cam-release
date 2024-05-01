@@ -1,3 +1,26 @@
+## usb_cam (rolling) - 0.8.1-1
+
+The packages in the `usb_cam` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --ros-distro rolling --track rolling usb_cam` on `Wed, 01 May 2024 16:56:43 -0000`
+
+The `usb_cam` package was released.
+
+Version of package(s) in repository `usb_cam`:
+
+- upstream repository: https://github.com/ros-drivers/usb_cam.git
+- release repository: https://github.com/ros2-gbp/usb_cam-release.git
+- rosdistro version: `0.8.0-2`
+- old version: `0.8.0-2`
+- new version: `0.8.1-1`
+
+Versions of tools used:
+
+- bloom version: `0.12.0`
+- catkin_pkg version: `1.0.0`
+- rosdep version: `0.23.0`
+- rosdistro version: `0.9.0`
+- vcstools version: `0.1.42`
+
+
 ## usb_cam (jazzy) - 0.8.0-1
 
 The packages in the `usb_cam` repository were released into the `jazzy` distro by running `/usr/local/google/home/marcogg/migration/bin/bloom-release usb_cam --rosdistro jazzy` on `Mon, 22 Apr 2024 11:37:00 -0000`
