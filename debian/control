@@ -1,0 +1,12 @@
+Source: ros-kilted-usb-cam
+Section: misc
+Priority: optional
+Maintainer: Evan Flynn <evanflynn.msu@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), ffmpeg, libavcodec-dev, libavformat-dev, libavutil-dev, libswscale-dev, ros-kilted-ament-cmake-auto, ros-kilted-ament-cmake-gtest <!nocheck>, ros-kilted-ament-lint-auto <!nocheck>, ros-kilted-ament-lint-common <!nocheck>, ros-kilted-builtin-interfaces, ros-kilted-camera-info-manager, ros-kilted-cv-bridge, ros-kilted-image-transport, ros-kilted-image-transport-plugins, ros-kilted-rclcpp, ros-kilted-rclcpp-components, ros-kilted-ros-environment, ros-kilted-rosidl-default-generators, ros-kilted-sensor-msgs, ros-kilted-std-msgs, ros-kilted-std-srvs, v4l-utils, ros-kilted-ros-workspace, ros-kilted-rosidl-typesupport-fastrtps-c, ros-kilted-rosidl-typesupport-fastrtps-cpp
+Homepage: http://wiki.ros.org/usb_cam
+Standards-Version: 3.9.2
+
+Package: ros-kilted-usb-cam
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ffmpeg, libavcodec-dev, libavformat-dev, libavutil-dev, libswscale-dev, ros-kilted-builtin-interfaces, ros-kilted-camera-info-manager, ros-kilted-cv-bridge, ros-kilted-image-transport, ros-kilted-image-transport-plugins, ros-kilted-rclcpp, ros-kilted-rclcpp-components, ros-kilted-rosidl-default-runtime, ros-kilted-sensor-msgs, ros-kilted-std-msgs, ros-kilted-std-srvs, v4l-utils, ros-kilted-ros-workspace
+Description: A ROS Driver for V4L USB Cameras
