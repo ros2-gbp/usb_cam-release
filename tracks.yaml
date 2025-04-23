@@ -242,7 +242,8 @@ tracks:
     ros_distro: kilted
     vcs_type: git
     vcs_uri: https://github.com/ros-drivers/usb_cam.git
-    version: :{auto}
+    version: 0.8.1
+    version_saved: :{auto}
   kinetic:
     actions:
     - bloom-export-upstream :{vcs_local_uri} :{vcs_type} --tag :{release_tag} --display-uri
