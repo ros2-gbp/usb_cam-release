@@ -366,4 +366,5 @@ tracks:
     ros_distro: rolling
     vcs_type: git
     vcs_uri: https://github.com/ros-drivers/usb_cam.git
-    version: :{auto}
+    version: 0.8.1
+    version_saved: :{auto}
